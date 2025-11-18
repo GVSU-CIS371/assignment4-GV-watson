@@ -1,9 +1,7 @@
 <template>
   <div>
-    <Beverage :isIced="beverageStore.currentTemp === 'Cold'" 
-    :base="beverageStore.currentBase"
-    :creamer="beverageStore.currentCreamer" 
-    :syrup="beverageStore.currentSyrup" />
+    <Beverage :isIced="beverageStore.currentTemp === 'Cold'" :base="beverageStore.currentBase"
+      :creamer="beverageStore.currentCreamer" :syrup="beverageStore.currentSyrup" />
 
     <ul>
       <li>
@@ -43,26 +41,40 @@
             {{ c.name }}
           </label>
         </template>
+
+
       </li>
     </ul>
-    <input type="text" placeholder="Beverage Name" />
-    <button>🍺 Make Beverage</button>
+    <input type="text" placeholder="Beverage Name" v-model="beverageStore.currentName" />
+    <button @click="beverageStore.makeBeverage() ">🍺 Make Beverage </button>
+
+    <div id="beverage-container" style="margin-top: 20px">
+      <template v-for="each_bev in beverageStore.beverages" :key="each_bev.name">
+        <label>
+          <input type="radio" name="userBeverage" :value="each_bev" @change="beverageStore.showBeverage(each_bev)" />
+          {{ each_bev.name }}
+        </label>
+      </template>
+    </div>
   </div>
-  <div id="beverage-container" style="margin-top: 20px"></div>
+
+
+
 </template>
+
 
 <script setup lang="ts">
 import Beverage from "./components/Beverage.vue";
 import { useBeverageStore } from "./stores/beverageStore";
 const beverageStore = useBeverageStore();
 
-// Call init() when the component is mounted
+
 import { onMounted } from "vue";
 //import { ref, onMounted } from "vue";
 //import { useRoute } from "vue-router";
 
-import { getAuth, Auth } from "firebase/auth";
-const auth: Auth | null = getAuth();
+//import { getAuth, Auth } from "firebase/auth";
+//const auth: Auth | null = getAuth();
 onMounted(() => {
   beverageStore.init();
 });
