@@ -17,6 +17,16 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 
+
+// Function to fetch data from a Firestore collection
+async function fetchCollection<T>(collectionName: string): Promise<T[]> {
+  const querySnapshot = await getDocs(collection(db, collectionName));
+  return querySnapshot.docs.map(doc => ({
+    ...doc.data(),
+    id: doc.id, 
+  })) as T[];
+}
+
 export const useBeverageStore = defineStore("BeverageStore", {
   state: () => ({
     temps: tempretures,
@@ -33,7 +43,20 @@ export const useBeverageStore = defineStore("BeverageStore", {
   }),
 
   actions: {
-    init() {},
+
+    async init() { // Initialize the store by fetching data from Firestore *VS code generated fetchCollection
+      this.bases = await fetchCollection<BaseBeverageType>("bases");
+      this.syrups = await fetchCollection<SyrupType>("syrups");
+      this.creamers = await fetchCollection<CreamerType>("creamers");
+      this.beverages = await fetchCollection<BeverageType>("beverages");
+      this.currentBase = this.bases.length > 0 ? this.bases[0] : null;
+      this.currentSyrup = this.syrups.length > 0 ? this.syrups[0] : null;
+      this.currentCreamer = this.creamers.length > 0 ? this.creamers[0] : null;
+    
+    //await this.fetchBeverages();
+    },
+
+
     makeBeverage() {},
 
     showBeverage() {},
