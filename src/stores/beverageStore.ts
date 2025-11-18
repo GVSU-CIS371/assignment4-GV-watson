@@ -10,11 +10,12 @@ import db from "../firebase.ts";
 import {
   collection,
   getDocs,
-  setDoc,
-  doc,
-  QuerySnapshot,
-  QueryDocumentSnapshot,
-  onSnapshot,
+  //setDoc,
+  //doc,
+  //QuerySnapshot,
+  //QueryDocumentSnapshot,
+  //onSnapshot,
+  addDoc,
 } from "firebase/firestore";
 
 
@@ -52,13 +53,29 @@ export const useBeverageStore = defineStore("BeverageStore", {
       this.currentBase = this.bases.length > 0 ? this.bases[0] : null;
       this.currentSyrup = this.syrups.length > 0 ? this.syrups[0] : null;
       this.currentCreamer = this.creamers.length > 0 ? this.creamers[0] : null;
-    
     //await this.fetchBeverages();
     },
 
+    
+    async makeBeverage() {
+      const newBeverage  = {
+        name: this.currentName,
+        temp: this.currentTemp,
+        base: this.currentBase,
+        creamer: this.currentCreamer,
+        syrup: this.currentSyrup,
+      };
+      await addDoc(collection(db, "beverages"), newBeverage);
+      this.currentName = "";
+    },
 
-    makeBeverage() {},
 
-    showBeverage() {},
-  },
+    showBeverage(beverage: BeverageType) {
+      this.currentBeverage = beverage;
+      this.currentTemp = beverage.temp;
+      this.currentBase = beverage.base;
+      this.currentCreamer = beverage.creamer;
+      this.currentSyrup = beverage.syrup;
+    }
+  }
 });
