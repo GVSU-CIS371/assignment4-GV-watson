@@ -16,17 +16,16 @@ import {
   //QueryDocumentSnapshot,
   //onSnapshot,
   addDoc,
+  //getDoc,
+  //doc,
 } from "firebase/firestore";
 
-
-// Function to fetch data from a Firestore collection
 async function fetchCollection<T>(collectionName: string): Promise<T[]> {
   const querySnapshot = await getDocs(collection(db, collectionName));
-  return querySnapshot.docs.map(doc => ({
-    ...doc.data(),
-    id: doc.id, 
-  })) as T[];
-}
+  const items: T[] = [];
+  querySnapshot.forEach((doc) => {items.push({ ...doc.data(), id: doc.id } as T); });
+  return items;
+}// Fetch collection from firestore and return as arraytype T
 
 export const useBeverageStore = defineStore("BeverageStore", {
   state: () => ({
@@ -53,7 +52,6 @@ export const useBeverageStore = defineStore("BeverageStore", {
       this.currentBase = this.bases.length > 0 ? this.bases[0] : null;
       this.currentSyrup = this.syrups.length > 0 ? this.syrups[0] : null;
       this.currentCreamer = this.creamers.length > 0 ? this.creamers[0] : null;
-    //await this.fetchBeverages();
     },
 
     
@@ -65,10 +63,10 @@ export const useBeverageStore = defineStore("BeverageStore", {
         creamer: this.currentCreamer,
         syrup: this.currentSyrup,
       };
-      await addDoc(collection(db, "beverages"), newBeverage);
+      await addDoc(collection(db, "beverages"), newBeverage);// Add new beverage to Firestore
+      this.beverages.push(newBeverage as BeverageType); // Update local state
       this.currentName = "";
     },
-
 
     showBeverage(beverage: BeverageType) {
       this.currentBeverage = beverage;
@@ -76,6 +74,7 @@ export const useBeverageStore = defineStore("BeverageStore", {
       this.currentBase = beverage.base;
       this.currentCreamer = beverage.creamer;
       this.currentSyrup = beverage.syrup;
-    }
-  }
+    },
+  },
 });
+
